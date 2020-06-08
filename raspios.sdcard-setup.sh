@@ -6,7 +6,7 @@ if [ $# -eq 0 ] ; then
 	exit
 fi
 
-IMGSRCZIP=/nas1/media/new/2020-05-27-raspios-buster-lite-armhf.zip
+IMGSRCZIP=images/2020-05-27-raspios-buster-lite-armhf.zip
 TGTDEVICE=${1}
 MNTPOINT=/mnt/2
 
