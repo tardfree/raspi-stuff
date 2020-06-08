@@ -1,0 +1,9 @@
+[pi]
+clearpi 
+blackpi
+localhost ansible_port=5022
+
+[pi:vars]
+ansible_python_interpreter = /usr/bin/python3
+ansible_ssh_common_args = '-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null'
+#those 2 ssh options allow password auth, to an unknown target (dangerous usually yes)
