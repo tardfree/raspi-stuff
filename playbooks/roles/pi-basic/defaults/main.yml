@@ -1,7 +1,7 @@
 ---
 
 # System defaults:
-pibasic_hostname: "pi"
+pibasic_hostname: "raspberrypi"
 pibasic_timezone: "UTC"
 
 # When set to empty string, it means do not change
