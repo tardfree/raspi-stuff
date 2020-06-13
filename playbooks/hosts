@@ -1,7 +1,7 @@
 [pi]
 clearpi 
 blackpi
-localhost ansible_port=5022
+qemu ansible_port=5022 ansible_host=localhost
 
 [pi:vars]
 ansible_python_interpreter = /usr/bin/python3

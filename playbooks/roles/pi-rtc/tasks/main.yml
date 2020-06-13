@@ -1,5 +1,10 @@
 ---
 
+- name: Detect QEMU
+  set_fact:
+    is_qemu: "{{ true if ansible_facts.devices.sda.model is defined and
+      'QEMU' in ansible_facts.devices.sda.model else false }}"
+
 - name: Setup pi config.txt for RTC
   lineinfile:
     path: /boot/config.txt
@@ -19,19 +24,23 @@
     name:
       - i2c-tools
     update_cache: true
-  when: pirtc_enable|bool
+  when: pirtc_enable | bool
 
 - name: Setup RTC kernel module
   modprobe:
-    name: rtc-ds3232
-  when: pirtc_enable|bool
+    name: "{{ pirtc_module_name }}"
+  when:
+    - pirtc_enable | bool
+    - not is_qemu
 
 - name: I2C scan for RTC
   command:
-    cmd: i2cdetect -y 1 0x68 0x68
+    cmd: i2cdetect -y 1 "{{ pirtc_i2c_address }}" "{{ pirtc_i2c_address }}"
   register: i2cdetect
   changed_when: false
-  when: pirtc_enable|bool
+  when:
+    - pirtc_enable | bool
+    - not is_qemu
 
 - debug:
     var: i2cdetect
@@ -45,10 +54,10 @@
 #i2cdetect -y 1 0x68 0x68
 
 #RTC clock change BUT ONLY IF THE HARDWARE IS PRESENT
-#    - name: Install some packages for RTC support
-#      apt:
-#        name: fake-hwclock
-#        state: absent
-#        autoclean: yes
-#        autoremove: yes
-#      when: pirtc_enable|bool
+#- name: Install some packages for RTC support
+#  apt:
+#    name: fake-hwclock
+#    state: absent
+#    autoclean: yes
+#    autoremove: yes
+#  when: pirtc_enable | bool

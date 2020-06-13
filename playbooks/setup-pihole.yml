@@ -5,11 +5,11 @@
 # * Out of box, raspios (raspbian) pi WITH SSH enabled
 
 # Initial ansible connection test:
-# ansible -i hosts pi -m setup -e "ansible_password=raspberry ansible_user=pi" -e \
+# ansible pi -m setup -e "ansible_password=raspberry ansible_user=pi" -e \
 # "ansible_ssh_common_args='-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null'"
 
 # Provision a pihole:
-# ansible-playbook -i hosts play.yml --limit=<hostpattern>
+# ansible-playbook setup-pihole.yml --limit=<hostpattern>
 
 # Qemu ssh:
 # ssh -p 5022 pi@localhost -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null
@@ -19,197 +19,15 @@
   become: yes
   vars:
     ansible_password: raspberry #this is the initial password only, and gets changed
-    piuser_password_hash: "{{ vault_piuser_password | default('raspberry') |
-      password_hash('sha512', 'HZYXyiX9G5TPH') }}" #new password from vault var, salted
-    pihole_hostname: pihole
-    pihole_conf_dir: /etc/pihole
-    pihole_url: "https://install.pi-hole.net"
-    #all 4 dns servers are googles
-    pihole_dns1: "8.8.8.8"
-    pihole_dns2: "8.8.4.4"
-    pihole_dns3: "2001:4860:4860:0:0:0:0:8888"
-    pihole_dns4: "2001:4860:4860:0:0:0:0:8844"
-    pihole_admin_password_hash: "{{ vault_pihole_admin_password | default('') }}"
 
-    pihole_timezone: "Australia/Perth"
-    enable_rtc: true
-  vars_files:
-    - vault.yml
-
-  pre_tasks:
-    - debug:
-        msg: "ansible_user is: {{ ansible_user }}"
-
-    - name: Set ssh key for {{ ansible_user }} user
-      become: false
-      authorized_key:
-        user: "{{ ansible_user }}"
-        state: present
-        key: "{{ vault_piuser_sshkey }}"
-      when:
-        - vault_piuser_sshkey is defined
-        - vault_piuser_sshkey|length > 0
-
-    - name: Change the {{ ansible_user }} user password
-      user:
-        name: "{{ ansible_user }}"
-        password: "{{ piuser_password_hash }}"
-      when:
-        - vault_piuser_password is defined
-        - vault_piuser_password|length > 0
-
-    - name: Set hostname to {{ pihole_hostname }}
-      hostname:
-        name: "{{ pihole_hostname }}"
-
-    - name: Update hosts file with hostname
-      replace:
-        path: /etc/hosts
-        regexp: 'raspberrypi'
-        replace: "{{ pihole_hostname }}"
-
-    - name: Set timezone to {{ pihole_timezone }}
-      timezone:
-        name: "{{ pihole_timezone }}"
-
-    - name: Update keyboard layout
-      lineinfile:
-        path: /etc/default/keyboard
-        regexp: 'XKBLAYOUT=.*'
-        line: 'XKBLAYOUT="us"'
-
-    - name: Backup vanilla config.txt
-      copy:
-        remote_src: yes
-        src: /boot/config.txt
-        dest: /boot/config.vanilla.txt
-        force: no
-
-    - name: Setup pi config.txt
-      lineinfile:
-        path: /boot/config.txt
-        regex: "{{ item.regex }}"
-        line: "{{ item.newline }}"
-      loop:
-        - { regex: '#?gpu_mem=.*', newline: 'gpu_mem=16' }
-        - { regex: '#?dtparam=.*audio=.*', newline: "dtparam=audio=off" }
-        - { regex: '#?disable_overscan=.*', newline: "disable_overscan=1" }
-      loop_control:
-        label: "{{ item.newline }}"
-      register: piconfigupdate
-      notify: Reboot system
-
-    - name: Setup pi config.txt for RTC
-      lineinfile:
-        path: /boot/config.txt
-        regex: "{{ item.regex }}"
-        line: "{{ item.newline }}"
-      loop:
-        - { regex: '#?dtparam=.*i2c_arm=.*', newline: "dtparam=i2c_arm=on" }
-        - { regex: '#?dtoverlay=.*i2c-rtc.*', newline: "dtoverlay=i2c-rtc,ds3231" }
-      loop_control:
-        label: "{{ item.newline }}"
-      register: piconfigupdatertc
-      when: enable_rtc|bool
-      notify: Reboot system
-
-    - name: Put /var/log on ramdisk
-      mount:
-        state: present
-        src: tmpfs
-        path: /var/log
-        fstype: tmpfs
-        opts: defaults,noatime,nosuid,mode=0755,size=100m
-      notify: Reboot system
-
-    - name: Perform apt update
-      apt:
-        upgrade: safe
-        update_cache: true
-
-    - name: Install some packages for RTC support
-      apt:
-        name:
-          - i2c-tools
-      when: enable_rtc|bool
-
-    - name: Setup RTC kernel module
-      modprobe:
-        name: rtc-ds3232
-      when: enable_rtc|bool
+#  pre_tasks:
 
   tasks:
-    - name: Download pihole installer
-      get_url:
-        url: "{{ pihole_url }}"
-        dest: /root/install-pihole.sh
-        mode: 0700
+    - import_role:
+        name: pi-basic
 
-    - name: Create pihole configuration directory
-      file:
-        name: "{{ pihole_conf_dir }}"
-        state: directory
-        owner: '999' # uid=pihole, which doesn't exist yet
-        group: '995' # gid=pihole, which doesn't exist yet
-        mode: 0775
+    - import_role:
+        name: pi-rtc
 
-    - name: Check for pihole configuration backup
-      stat:
-        path: "{{ pihole_conf_dir }}/setupVars.conf.update.bak"
-      register: config_stat
-
-    - name: Create pihole configuration
-      template:
-        src: setupVars.conf.j2
-        dest: "{{ pihole_conf_dir }}/setupVars.conf"
-        owner: root
-        group: root
-        mode: 0644
-      when: config_stat.stat.exists == false
-
-    - name: Install pihole
-      command:
-        cmd: /root/install-pihole.sh --unattended
-        creates: /etc/pihole/install.log
-
-    - name: Tweak pihole config
-      lineinfile:
-        path: /etc/pihole/pihole-FTL.conf
-        line: "DBINTERVAL=60" #mins. only write db this often (default is 1min)
-      notify: Restart pihole
-
-    - name: I2C scan for RTC
-      command:
-        cmd: i2cdetect -y 1 0x68 0x68
-      register: i2cdetect
-      changed_when: false
-      when: enable_rtc|bool
-
-    - debug:
-        var: i2cdetect
-
-    - debug:
-        msg: "i think we have rtc"
-      when:
-        - i2cdetect.stdout_lines[7] is defined
-        - '"68" in i2cdetect.stdout_lines[7]'
-
-#i2cdetect -y 1 0x68 0x68
-
-#RTC clock change BUT ONLY IF THE HARDWARE IS PRESENT
-#    - name: Install some packages for RTC support
-#      apt:
-#        name: fake-hwclock
-#        state: absent
-#        autoclean: yes
-#        autoremove: yes
-#      when: enable_rtc|bool
-
-  handlers:
-    - name: Reboot system
-      reboot:
-
-    - name: Restart pihole
-      systemd:
-        name: pihole-FTL
-        state: restarted
+    - import_role:
+        name: pi-pihole

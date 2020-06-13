@@ -1,4 +1,4 @@
-WEBPASSWORD={{ pihole_admin_password_hash }}
+WEBPASSWORD={{ pihole_admin_password | hash('sha256') | hash('sha256') }}
 TEMPERATUREUNIT=C
 PIHOLE_INTERFACE=eth0
 IPV4_ADDRESS={{ ansible_default_ipv4.address if ansible_all_ipv4_addresses|count > 0 else '' }}

@@ -1,6 +1,7 @@
 ---
 
-- debug:
+- name: Identify user
+  debug:
     msg: "Ansible_user is: {{ ansible_user }}"
 
 - name: Set ssh key for {{ ansible_user }} user

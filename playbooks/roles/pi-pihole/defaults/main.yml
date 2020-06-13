@@ -1,8 +1,15 @@
 ---
 
+# Things you WILL want to change
 pihole_admin_password: "{{ vault_pihole_admin_password | default('password') }}"
 
-#vault_pihole_admin_password: "password"
-vault_pihole_admin_password: "113459eb7bb31bddee85ade5230d6ad5d8b2fb52879e00a84ff6ae1067a210d3"
-# echo -n password | sha256sum | awk '{printf "%s",$1 }' | sha256sum
-# 113459eb7bb31bddee85ade5230d6ad5d8b2fb52879e00a84ff6ae1067a210d3  -
+# Things you might want to change
+pihole_dns1: "8.8.8.8"
+pihole_dns2: "8.8.4.4"
+pihole_dns3: "2001:4860:4860:0:0:0:0:8888"
+pihole_dns4: "2001:4860:4860:0:0:0:0:8844"
+# all 4 dns servers are googles
+
+# Things you probably wont want to change
+pihole_url: "https://install.pi-hole.net"
+pihole_conf_dir: /etc/pihole

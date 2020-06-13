@@ -1,3 +1,6 @@
 ---
 
 pirtc_enable: true
+
+pirtc_module_name: "rtc-ds3232"
+pirtc_i2c_address: "0x68"
