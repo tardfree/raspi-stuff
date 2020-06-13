@@ -1,0 +1,8 @@
+---
+#Reminder: ansible-vault encrypt vault.yml
+
+vault_piuser_password: "raspberry"
+# yamllint disable-line rule:line-length
+vault_piuser_sshkey: "ssh-rsa xxxx user@box"
+
+vault_pihole_admin_password: "password"
