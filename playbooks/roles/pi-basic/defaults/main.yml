@@ -1,8 +1,8 @@
 ---
 
 # System defaults:
-pibasic_hostname: "{{ vault_hostname | default('pi') }}"
-pibasic_timezone: "{{ vault_timezone | default('Australia/Perth') }}"
+pibasic_hostname: "pi"
+pibasic_timezone: "UTC"
 
 # When set to empty string, it means do not change
 pibasic_piuser_password: "{{ vault_piuser_password | default('') }}"

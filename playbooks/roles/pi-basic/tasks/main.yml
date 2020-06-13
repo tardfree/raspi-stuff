@@ -1,7 +1,7 @@
 ---
 
 - debug:
-    msg: "ansible_user is: {{ ansible_user }}"
+    msg: "Ansible_user is: {{ ansible_user }}"
 
 - name: Set ssh key for {{ ansible_user }} user
   become: false
@@ -32,9 +32,9 @@
     regexp: 'raspberrypi'
     replace: "{{ pibasic_hostname }}"
 
-- name: Set timezone to {{ pihole_timezone }}
+- name: Set timezone to {{ pibasic_timezone }}
   timezone:
-    name: "{{ pihole_timezone }}"
+    name: "{{ pibasic_timezone }}"
 
 - name: Update keyboard layout
   lineinfile:
