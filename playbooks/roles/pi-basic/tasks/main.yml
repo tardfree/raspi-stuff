@@ -1,0 +1,78 @@
+---
+
+- debug:
+    msg: "ansible_user is: {{ ansible_user }}"
+
+- name: Set ssh key for {{ ansible_user }} user
+  become: false
+  authorized_key:
+    user: "{{ ansible_user }}"
+    state: present
+    key: "{{ pibasic_piuser_sshkey }}"
+  when:
+    - pibasic_piuser_sshkey is defined
+    - pibasic_piuser_sshkey | length > 0
+
+- name: Change the {{ ansible_user }} user password
+  user:
+    name: "{{ ansible_user }}"
+    password: "{{ pibasic_piuser_password |
+      password_hash('sha512', pibasic_pwhash_salt) }}"
+  when:
+    - pibasic_piuser_password is defined
+    - pibasic_piuser_password | length > 0
+
+- name: Set hostname to {{ pibasic_hostname }}
+  hostname:
+    name: "{{ pibasic_hostname }}"
+
+- name: Update hosts file with hostname
+  replace:
+    path: /etc/hosts
+    regexp: 'raspberrypi'
+    replace: "{{ pibasic_hostname }}"
+
+- name: Set timezone to {{ pihole_timezone }}
+  timezone:
+    name: "{{ pihole_timezone }}"
+
+- name: Update keyboard layout
+  lineinfile:
+    path: /etc/default/keyboard
+    regexp: 'XKBLAYOUT=.*'
+    line: 'XKBLAYOUT="us"'
+
+- name: Backup vanilla config.txt
+  copy:
+    remote_src: yes
+    src: /boot/config.txt
+    dest: /boot/config.vanilla.txt
+    force: no
+
+- name: Setup pi config.txt
+  lineinfile:
+    path: /boot/config.txt
+    regex: "{{ item.regex }}"
+    line: "{{ item.newline }}"
+  loop:
+    - { regex: '#?gpu_mem=.*', newline: 'gpu_mem=16' }
+    - { regex: '#?dtparam=.*audio=.*', newline: "dtparam=audio=off" }
+    - { regex: '#?disable_overscan=.*', newline: "disable_overscan=1" }
+  loop_control:
+    label: "{{ item.newline }}"
+  register: piconfigupdate
+  notify: Reboot system
+
+- name: Put /var/log on ramdisk
+  mount:
+    state: present
+    src: tmpfs
+    path: /var/log
+    fstype: tmpfs
+    opts: defaults,noatime,nosuid,mode=0755,size=100m
+  notify: Reboot system
+
+- name: Perform apt update
+  apt:
+    upgrade: safe
+    update_cache: true
