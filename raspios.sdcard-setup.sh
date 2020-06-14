@@ -37,9 +37,11 @@ echo Writing image to device now...
 echo -e "\n"
 sync
 
-echo Mounting on ${MNTPOINT} to enable ssh...
+#TGTPART=$(lsblk -o NAME,TYPE -n -p -l ${TGTDEVICE} | awk 'NR==2{print $1}')
+TGTPART=/dev/$(ls -1 /sys/block/${TGTDEVICE#/dev/}/${TGTDEVICE#/dev/}*/partition | awk -F'/' 'NR==1{print $5}')
+echo Mounting ${TGTPART} on ${MNTPOINT} to enable ssh...
 mkdir -p ${MNTPOINT}
-mount ${TGTDEVICE}p1 ${MNTPOINT}
+mount ${TGTPART} ${MNTPOINT}
 echo "blah" > ${MNTPOINT}/ssh
 echo "blah" > ${MNTPOINT}/ssh.txt
 umount ${MNTPOINT}
