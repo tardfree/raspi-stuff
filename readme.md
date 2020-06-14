@@ -46,6 +46,9 @@ is left on disk, enabling easy rollback by running the `qemu-img convert` step a
 The `run.sh` script launches the emulator. Note: this will reboot ok if necessary, but
 poweroff doesn't work and results in a halt only.
 
+To SSH into the virtual instance:
+`ssh -p 5022 pi@localhost -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null`
+
 ## Scripts and tools
 
 * `raspios.sdcard-setup.sh` SD card writing script, which injects SSH and WIFI

@@ -11,16 +11,11 @@
 # Provision a pihole:
 # ansible-playbook setup-pihole.yml --limit=<hostpattern>
 
-# Qemu ssh:
-# ssh -p 5022 pi@localhost -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null
-
 - hosts: pi
   remote_user: pi
   become: yes
   vars:
     ansible_password: raspberry #this is the initial password only, and gets changed
-
-#  pre_tasks:
 
   tasks:
     - import_role:
