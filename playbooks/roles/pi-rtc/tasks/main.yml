@@ -11,13 +11,26 @@
     regex: "{{ item.regex }}"
     line: "{{ item.newline }}"
   loop:
-    - { regex: '#?dtparam=.*i2c_arm=.*', newline: "dtparam=i2c_arm=on" }
     - { regex: '#?dtoverlay=.*i2c-rtc.*', newline: "dtoverlay=i2c-rtc,ds3231" }
   loop_control:
     label: "{{ item.newline }}"
   register: piconfigupdatertc
   when: pirtc_enable|bool
   notify: Reboot system
+
+- name: Run handlers to reboot here if needed
+  meta: flush_handlers
+
+- name: Setup i2c kernel modules
+  modprobe:
+    name: "{{ item }}"
+  loop:
+    - "i2c-bcm2708"
+    - "i2c-dev"
+    - "{{ pirtc_module_name }}"
+  when:
+    - pirtc_enable | bool
+    - not is_qemu
 
 - name: Install some packages for RTC support
   apt:
@@ -26,16 +39,9 @@
     update_cache: true
   when: pirtc_enable | bool
 
-- name: Setup RTC kernel module
-  modprobe:
-    name: "{{ pirtc_module_name }}"
-  when:
-    - pirtc_enable | bool
-    - not is_qemu
-
 - name: I2C scan for RTC
   command:
-    cmd: i2cdetect -y 1 "{{ pirtc_i2c_address }}" "{{ pirtc_i2c_address }}"
+    cmd: i2cdetect -y 1 "0x{{ pirtc_i2c_address }}" "0x{{ pirtc_i2c_address }}"
   register: i2cdetect
   changed_when: false
   when:
@@ -49,7 +55,7 @@
     msg: "i think we have rtc"
   when:
     - i2cdetect.stdout_lines[7] is defined
-    - '"68" in i2cdetect.stdout_lines[7]'
+    - pirtc_i2c_address in i2cdetect.stdout_lines[7]
 
 #i2cdetect -y 1 0x68 0x68
 
