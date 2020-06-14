@@ -1,0 +1,9 @@
+---
+
+- name: Install wpa_supplicant configuraiton
+  template:
+    src: wpa_supplicant.conf.j2
+    dest: "{{ piwifi_dest }}/wpa_supplicant.conf"
+  when: 
+    - piwifi_enabled | bool
+    - piwifi_ssid | length > 0

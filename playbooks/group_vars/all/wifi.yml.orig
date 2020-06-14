@@ -1,0 +1,5 @@
+---
+#Reminder: ansible-vault encrypt wifi.yml
+
+vault_wifi_network_ssid: ""
+vault_wifi_network_psk: ""
