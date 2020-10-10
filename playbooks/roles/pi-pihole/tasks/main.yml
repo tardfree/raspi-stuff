@@ -36,5 +36,8 @@
 - name: Tweak pihole config
   lineinfile:
     path: /etc/pihole/pihole-FTL.conf
-    line: "DBINTERVAL=60" #mins. only write db this often (default is 1min)
+    line: "{{ item }}"
   notify: Restart pihole
+  loop:
+    - "DBINTERVAL=60" #mins. only write db this often (default is 1min)
+    - "AAAA_QUERY_ANALYSIS=yes" #for ipv6 queries to work?
