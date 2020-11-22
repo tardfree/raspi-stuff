@@ -1,0 +1,16 @@
+---
+# Zerotier on a pi
+
+# Pre-reqs:
+# * Out of box, raspios (raspbian) pi WITH SSH enabled
+# * ssh keys already setup
+
+# ansible-playbook setup-zerotier.yml --limit=<hostpattern>
+
+- hosts: pi
+  remote_user: pi
+  become: yes
+
+  tasks:
+    - import_role:
+        name: zerotier

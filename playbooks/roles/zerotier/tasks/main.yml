@@ -1,0 +1,48 @@
+---
+# file: roles/zerotier/tasks/main.yml
+
+- name: Add zerotier repo
+  copy: 
+    dest: "/etc/apt/sources.list.d/zerotier.list"
+    owner: root
+    group: root
+    mode: "0644"
+    content: "deb http://download.zerotier.com/debian/buster buster main"
+
+- name: add zerotier GPG key
+  copy:
+    src: zerotier.gpg
+    dest: /etc/zerotier.gpg
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: add zerotier GPG key
+  apt_key:
+    state: present
+    file: /etc/zerotier.gpg
+
+- name: insert firewalld rules for zerotier
+  firewalld:
+    port: "{{ item }}"
+    permanent: yes
+    state: enabled
+    immediate: yes
+  loop:
+    - 9993/udp
+  when: zerotier_setup_firewall
+
+- name: install zerotier
+  apt:
+    name: zerotier-one
+    state: present
+    update_cache: yes
+
+- name: enable zerotier-one service
+  service:
+    name: zerotier-one
+    enabled: yes
+    state: started
+
+- include: join_network.yml
+  when: zerotier_joinnetwork

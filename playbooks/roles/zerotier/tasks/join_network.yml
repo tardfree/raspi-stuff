@@ -1,0 +1,89 @@
+---
+#this mostly came from: https://github.com/madAndroid/ansible-role-zerotier
+
+- name: Check if the zerotier network config file is present
+  stat:
+    path: "/var/lib/zerotier-one/networks.d/{{ zerotier_network_id }}.conf"
+  register: ztnet_conf
+
+- name: Join Zerotier network
+  when:
+  - zerotier_accesstoken is defined
+  - not ansible_check_mode
+  - ztnet_conf.stat.exists == False
+  block:
+  - name: zerotier | Pause for 60 seconds for Zerotier to start
+    pause:
+      seconds: 60
+
+  - name: Get Zerotier NodeID
+    shell: zerotier-cli info -j
+    check_mode: no
+    register: zerotier_info
+
+  - name: Override zerotier device name
+    copy:
+      content: "{{ zerotier_network_id }}=zt0\n"
+      dest: /var/lib/zerotier-one/devicemap
+      owner: zerotier-one
+      group: zerotier-one
+    #this overrides the "stable" device naming which is determined from the network name
+
+  - name: Join Zerotier network
+    command: zerotier-cli join -j {{ zerotier_network_id }}
+#    creates: /var/lib/zerotier-one/networks.d/{{ zerotier_network_id }}.conf
+    check_mode: no
+#This checkmode is ok, as the whole block won't run in check mode
+    changed_when: false
+    register: zerotier_network
+
+  - name: zerotier | register responses
+    set_fact:
+      zerotier_node_id: "{{ (zerotier_info.stdout | from_json).address }}"
+      zerotier_device: "{{ (zerotier_network.stdout | from_json).portDeviceName }}"
+      zerotier_net_name: "{{ (zerotier_network.stdout | from_json).name }}"
+      zerotier_ip: "{{ (zerotier_network.stdout | from_json).assignedAddresses }}"
+      zerotier_status: "{{ (zerotier_network.stdout | from_json).status }}"
+      zerotier_description: "{{ ansible_fqdn }}"
+
+  - name: zerotier | Pause for 3 seconds before authorising the node
+    pause:
+      seconds: 3
+
+  - name: Notify API of members to authorise
+    uri:
+      url: "{{ zerotier_api_url }}/api/network/{{ zerotier_network_id }}/member/{{ zerotier_node_id }}"
+      method: POST
+      headers:
+        Authorization: bearer {{ zerotier_accesstoken }}
+      body:
+        config:
+          authorized: true
+      body_format: json
+
+  - name: zerotier | Pause for 3 seconds before authorising the node
+    pause:
+      seconds: 3
+
+  - name: Add and authorize members to network
+    uri:
+      url: "{{ zerotier_api_url }}/api/network/{{ zerotier_network_id }}/member/{{ zerotier_node_id }}"
+      method: POST
+      headers:
+        Authorization: bearer {{ zerotier_accesstoken }}
+      body:
+        name: "{{ zerotier_name }}"
+        description: "{{ zerotier_description }}"
+        hidden: false
+        config:
+          authorized: true
+      body_format: json
+      return_content: yes
+    register: apiresult
+
+  - name: zerotier | dump authorisation response
+    debug:
+      var: apiresult
+      verbosity: 2
+    tags:
+      - debug

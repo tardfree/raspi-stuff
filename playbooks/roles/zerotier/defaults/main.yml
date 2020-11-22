@@ -1,0 +1,11 @@
+---
+zerotier_api_url: https://my.zerotier.com
+zerotier_name: "{{ inventory_hostname }}"
+
+zerotier_setup_firewall: no
+#raspbian doesn't have firewalld or the firewalld python module installed
+
+##Network to join
+zerotier_joinnetwork: yes
+zerotier_accesstoken: "{{ vault_zerotier_accesstoken }}"
+zerotier_network_id: "{{ vault_zerotier_network_id }}"

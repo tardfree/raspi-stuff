@@ -6,3 +6,7 @@ vault_piuser_password: "raspberry"
 vault_piuser_sshkey: "ssh-rsa xxxx user@box"
 
 vault_pihole_admin_password: "password"
+
+# Zerotier
+vault_zerotier_accesstoken: ""
+vault_zerotier_network_id: ""
