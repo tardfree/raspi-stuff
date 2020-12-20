@@ -7,7 +7,7 @@ if [ $# -eq 0 ] ; then
 	exit
 fi
 
-IMGSRCZIP=images/2020-05-27-raspios-buster-lite-armhf.zip
+IMGSRCZIP=images/2020-12-02-raspios-buster-armhf-lite.zip
 TGTDEVICE=${1}
 WIFI=${2:-0} #1 or 0
 WIFI_PLAY=playbooks/basicwificonfig.yml
