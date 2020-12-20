@@ -70,7 +70,7 @@
     src: tmpfs
     path: /var/log
     fstype: tmpfs
-    opts: defaults,noatime,nosuid,mode=0755,size=100m
+    opts: defaults,noatime,nosuid,mode=0755,size=200m
   notify: Reboot system
 
 - name: Perform apt update
