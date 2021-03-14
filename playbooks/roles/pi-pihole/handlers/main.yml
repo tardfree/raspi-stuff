@@ -4,3 +4,8 @@
   systemd:
     name: pihole-FTL
     state: restarted
+
+- name: Restart watchdog
+  systemd:
+    name: watchdog
+    state: restarted

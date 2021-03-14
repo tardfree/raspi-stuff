@@ -1,0 +1,26 @@
+---
+
+- name: Install watchdog
+  apt:
+    name:
+      - watchdog
+    update_cache: true
+
+- name: Configure watchdog
+  lineinfile:
+    path: /etc/watchdog.conf
+    regex: "{{ item.regex }}"
+    line: "{{ item.newline }}"
+  loop:
+    - { regex: '#?pidfile = /var/run/pihole-FTL.pid.*', newline: "pidfile = /var/run/pihole-FTL.pid" }
+    - { regex: '#?retry-timeout.*=.*', newline: "retry-timeout = 60" }
+    - { regex: '#?interval.*=.*', newline: "interval = 30" }
+  loop_control:
+    label: "{{ item.newline }}"
+  notify: Restart watchdog
+
+- name: Enable watchdog service
+  systemd:
+    name: watchdog
+    state: started
+    enabled: yes
