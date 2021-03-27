@@ -5,5 +5,6 @@ qemu ansible_port=5022 ansible_host=localhost
 
 [pi:vars]
 ansible_python_interpreter = /usr/bin/python3
-ansible_ssh_common_args = '-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null'
+ansible_ssh_common_args = '-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o AddressFamily=inet'
 #those 2 ssh options allow password auth, to an unknown target (dangerous usually yes)
+#and AddressFamily forces to connect over IPV4 (as raspios out of box doesn't do v6 yet)

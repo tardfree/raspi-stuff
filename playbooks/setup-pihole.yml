@@ -6,7 +6,7 @@
 
 # Initial ansible connection test:
 # ansible pi -m setup -e "ansible_password=raspberry ansible_user=pi" -e \
-# "ansible_ssh_common_args='-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null'"
+# "ansible_ssh_common_args='-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o AddressFamily=inet'"
 
 # Provision a pihole:
 # ansible-playbook setup-pihole.yml --limit=<hostpattern>
