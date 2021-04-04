@@ -7,3 +7,10 @@
   when: 
     - piwifi_enabled | bool
     - piwifi_ssid | length > 0
+
+- name: Create the preboot ssh enable file
+  copy:
+    content: ""
+    dest: "{{ piwifi_dest }}/ssh"
+  when: piwifi_ssh_enable | bool
+  

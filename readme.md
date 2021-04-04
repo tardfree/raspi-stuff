@@ -23,7 +23,14 @@ occur.
 
 A very simple role to produce the `wpa_supplicant.conf` file for /boot. This file enables
 wifi. The role is written so it can be called separately also. (Playbook
-basicwificonfig.yml)
+basicwificonfig.yml). There is also the option of creating the enable ssh flag file.
+
+Available flags (with default options as shown) are:
+
+```yaml
+piwifi_enabled: true
+piwifi_ssh_enable: true
+```
 
 #### pi-pihole
 

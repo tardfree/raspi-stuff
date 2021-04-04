@@ -2,7 +2,7 @@
 # This play is to generate the supplicant config for an SD card writing process.
 
 # Used like this (for example, with local inventory):
-# ansible-playbook -i '127.0.0.1,' basicwificonfig.yml -e piwifi_dest=/tmp/
+# ansible-playbook basicwificonfig.yml -e piwifi_dest=/tmp/
 
 - hosts: localhost
   connection: local
@@ -13,3 +13,6 @@
   tasks:
     - import_role:
         name: pi-wifi
+      vars:
+        piwifi_enabled: true
+        piwifi_ssh_enable: true

@@ -7,3 +7,6 @@ piwifi_dest: "/boot"
 # Blank means don't configure
 piwifi_ssid: "{{ vault_wifi_network_ssid | default('') }}"
 piwifi_psk: "{{ vault_wifi_network_psk | default('') }}"
+
+# Also produce the preboot ssh enable flag file
+piwifi_ssh_enable: true
