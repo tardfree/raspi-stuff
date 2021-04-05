@@ -10,3 +10,13 @@ pibasic_piuser_sshkey: "{{ vault_piuser_sshkey | default('') }}"
 
 # By fixing the salt to a value it makes setting the password idempotent
 pibasic_pwhash_salt: "HZYXyiX9G5TPH"
+
+#GPU Memory, MB. 16 for headless. 256 for gui
+pibasic_gpumem: 16
+
+#put /var/log on ramdisk
+pibasic_ramdisk_log: false
+
+#Perth nas mount
+pibasic_nas_mount: false
+nas_hostname: ""

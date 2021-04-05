@@ -1,15 +1,15 @@
 ---
-# Pihole on a real pi
+# Setup an everyday pi
 
 # Pre-reqs:
 # * Out of box, raspios (raspbian) pi WITH SSH enabled
 
 # Initial ansible connection test:
-# ansible pi -m setup -e "ansible_password=raspberry ansible_user=pi" -e \
+# ansible pi -m setup -e "ansible_password=raspberry ansible_user=pi" --limit=einkpi -e \
 # "ansible_ssh_common_args='-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o AddressFamily=inet'"
 
-# Provision a pihole:
-# ansible-playbook setup-pihole.yml --limit=<hostpattern>
+# Provision:
+# ansible-playbook setup-pi.yml --limit=<hostpattern>
 
 - hosts: pi
   remote_user: pi
@@ -21,10 +21,7 @@
     - import_role:
         name: pi-basic
       vars:
-        pibasic_ramdisk_log: true
+        pibasic_nas_mount: true
 
-    - import_role:
-        name: pi-rtc
-
-    - import_role:
-        name: pi-pihole
+    #- import_role:
+    #    name: pi-rtc

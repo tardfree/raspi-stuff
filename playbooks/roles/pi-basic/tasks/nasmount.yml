@@ -1,0 +1,45 @@
+---
+#nas mount for Perth
+
+- name: Set nfs domain
+  replace: 
+    backup: yes
+    dest: "/etc/idmapd.conf"
+    regexp:  '^#?Domain = local.domain.edu$'
+    replace: 'Domain = tardfree.net'
+
+- name: Check if nasmount has been created before
+  stat:
+    path: "/{{ nas_hostname }}"
+  register: nasmount_mount_stat
+
+- name: Create mountpoint for {{ nas_hostname }}
+  when: nasmount_mount_stat.stat.exists == false
+  file:
+    dest: "/{{ nas_hostname }}"
+    owner: root
+    group: root
+    state: directory
+    seuser: system_u
+    serole: object_r
+    setype: autofs_t
+
+- name: Create symlink for mountpoint for {{ nas_hostname }}
+  when: nasmount_mount_stat.stat.exists == false
+  file:
+    src: "/{{ nas_hostname }}"
+    dest: /storage
+    owner: root
+    group: root
+    state: link
+    seuser: system_u
+    serole: object_r
+    setype: autofs_t
+
+- name: Add mount {{ nas_hostname }} to fstab
+  mount:
+    name: "/{{ nas_hostname }}"
+    src: "{{ nas_hostname }}:/{{ nas_hostname }}"
+    fstype: nfs
+    state: mounted
+    opts: "vers=4,timeo=50,comment=systemd.automount,_netdev"
