@@ -1,7 +1,8 @@
 [pi]
+raspberrypi #out of box hostname
 clearpi 
 blackpi
-einkpi pibasic_hostname=einkpi ansible_host=raspberrypi
+einkpi
 qemu ansible_port=5022 ansible_host=localhost
 
 [pi:vars]

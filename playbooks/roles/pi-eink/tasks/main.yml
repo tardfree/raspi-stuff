@@ -1,0 +1,39 @@
+---
+
+- name: Install packages for SPI and eink development
+  apt:
+    name:
+      - python3-pip
+      - python3-pil
+      - python3-numpy
+      - tmux
+      - git
+    update_cache: true
+
+- name: Install pip packages
+  pip:
+    name: RPi.GPIO
+
+- name: Add tmux conf
+  copy: 
+    src: tmux.conf
+    dest: /home/pi/.tmux.conf
+    owner: pi
+    group: pi
+    mode: "0644"
+
+- name: Setup pi config.txt for SPI
+  lineinfile:
+    path: /boot/config.txt
+    regex: "{{ item.regex }}"
+    line: "{{ item.newline }}"
+  loop:
+    - { regex: '#?dtparam=spi=on', newline: "dtparam=spi=on" }
+  loop_control:
+    label: "{{ item.newline }}"
+  register: pieinkupdate
+  when: pieink_enable|bool
+  notify: Reboot system
+
+- name: Run handlers to reboot here if needed
+  meta: flush_handlers
