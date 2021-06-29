@@ -1,0 +1,30 @@
+---
+
+#Trim ssd notes
+#https://www.jeffgeerling.com/blog/2020/enabling-trim-on-external-ssd-on-raspberry-pi
+
+- name: Install packages for checking trim sizes
+  apt:
+    name:
+      - sg3-utils
+      - lsscsi
+    update_cache: true
+
+- name: Drop in udev rules for known supported devices
+  copy:
+    dest: "/etc/udev/rules.d/10-trim-{{ item.name }}.rules"
+    content: >
+      ACTION=="add|change",
+      ATTRS{idVendor}=="{{ item.vendor }}",
+      ATTRS{idProduct}=="{{ item.product }}",
+      SUBSYSTEM=="scsi_disk",
+      ATTR{provisioning_mode}="unmap"
+  loop: #known working devices
+    - name: samsung-T5
+      vendor: "04e8"
+      product: "61f5"
+
+- name: Enable systemd trim timer
+  service:
+    name: fstrim.timer
+    enabled: true
