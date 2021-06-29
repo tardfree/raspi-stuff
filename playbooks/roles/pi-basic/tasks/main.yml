@@ -77,6 +77,23 @@
 - import_tasks: nasmount.yml
   when: pibasic_nas_mount | bool
 
+- name: Install a few packages
+  apt:
+    name:
+      - tmux
+    update_cache: true
+
+- name: Add tmux conf
+  copy: 
+    src: tmux.conf
+    dest: "{{ item.home }}/.tmux.conf"
+    owner: "{{ item.user }}"
+    group: "{{ item.user }}"
+    mode: "0644"
+  loop:
+    - { user: root, home: /root }
+    - { user: pi, home: /home/pi }
+
 - name: Perform apt update
   apt:
     upgrade: safe
