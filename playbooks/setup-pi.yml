@@ -5,15 +5,19 @@
 # * Out of box, raspios (raspbian) pi WITH SSH enabled
 
 # Initial ansible connection test: (this assumes raspberrypi resolves in dns)
-# ansible pi -m setup -e "ansible_password=raspberry ansible_user=pi" --limit=raspberrypi -e "ansible_ssh_common_args='-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o AddressFamily=inet'"
+# ansible pi -m setup -e "ansible_password=raspberry ansible_user=pi" --limit=raspberrypi
+# (this is using group pi, so the ssh ansible_ssh_common_args are set)
 
 # Provision:
 # initially (out of box hostname=raspberrypi and its in dns, so override hostname you want to set)
 # giving this the IP of the pi also means the reboot will succeed without the failure to reconnect
 # if the original hostname stops resolving upon reboot (dhcp server updates dns to the set hostname)
-# ansible-playbook setup-pi.yml --limit=raspberrypi -e pibasic_hostname=pi4 -e ansible_host=192.168.3.134 -e "ansible_ssh_common_args='-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o AddressFamily=inet'"
+# ansible-playbook setup-pi.yml --limit=raspberrypi -e pibasic_hostname=pi4 -e ansible_host=192.168.3.134
 
-# Then afterwards hostvars file overides hostname
+# for a gui install add: -e pibasic_gpumem=256 -e pibasic_audio=true
+# ansible-playbook setup-pi.yml --limit=raspberrypi -e pibasic_hostname=pi400 -e ansible_host=192.168.3.142 -e pibasic_gpumem=256 -e pibasic_audio=true
+
+# Then afterwards hostvars file overides hostname/gpumem
 # ansible-playbook setup-pi.yml --limit=pi4
 
 - hosts: pi

@@ -56,9 +56,12 @@
     regex: "{{ item.regex }}"
     line: "{{ item.newline }}"
   loop:
-    - { regex: '#?gpu_mem=.*', newline: "gpu_mem={{ pibasic_gpumem }}" }
-    - { regex: '#?dtparam=.*audio=.*', newline: "dtparam=audio=off" }
-    - { regex: '#?disable_overscan=.*', newline: "disable_overscan=1" }
+    - regex: '#?gpu_mem=.*'
+      newline: "gpu_mem={{ pibasic_gpumem }}"
+    - regex: '#?dtparam=.*audio=.*'
+      newline: "dtparam=audio={{ 'on' if pibasic_audio | bool else 'off' }}"
+    - regex: '#?disable_overscan=.*'
+      newline: "disable_overscan=1"
   loop_control:
     label: "{{ item.newline }}"
   register: piconfigupdate

@@ -1,0 +1,5 @@
+---
+
+pibasic_hostname: "pi400"
+pibasic_gpumem: 256
+pibasic_audio: true
