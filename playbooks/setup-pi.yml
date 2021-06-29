@@ -4,15 +4,17 @@
 # Pre-reqs:
 # * Out of box, raspios (raspbian) pi WITH SSH enabled
 
-# Initial ansible connection test:
-# ansible pi -m setup -e "ansible_password=raspberry ansible_user=pi" --limit=einkpi -e \
-# "ansible_ssh_common_args='-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o AddressFamily=inet'"
+# Initial ansible connection test: (this assumes raspberrypi resolves in dns)
+# ansible pi -m setup -e "ansible_password=raspberry ansible_user=pi" --limit=raspberrypi -e "ansible_ssh_common_args='-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o AddressFamily=inet'"
 
 # Provision:
-# initially (out of box hostname=raspberrypi, so override hostname you want to set)
-#   ansible-playbook setup-pi.yml --limit=raspberrypi -e pibasic_hostname=einkpi
+# initially (out of box hostname=raspberrypi and its in dns, so override hostname you want to set)
+# giving this the IP of the pi also means the reboot will succeed without the failure to reconnect
+# if the original hostname stops resolving upon reboot (dhcp server updates dns to the set hostname)
+# ansible-playbook setup-pi.yml --limit=raspberrypi -e pibasic_hostname=pi4 -e ansible_host=192.168.3.134 -e "ansible_ssh_common_args='-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o AddressFamily=inet'"
+
 # Then afterwards hostvars file overides hostname
-# ansible-playbook setup-pi.yml --limit=einkpi
+# ansible-playbook setup-pi.yml --limit=pi4
 
 - hosts: pi
   remote_user: pi
@@ -27,4 +29,7 @@
         pibasic_nas_mount: true
 
     - import_role:
-        name: pi-eink
+        name: pi-trimssd
+
+#    - import_role:
+#        name: pi-eink
