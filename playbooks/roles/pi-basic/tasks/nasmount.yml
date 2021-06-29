@@ -5,7 +5,7 @@
   replace: 
     backup: yes
     dest: "/etc/idmapd.conf"
-    regexp:  '^#?Domain = local.domain.edu$'
+    regexp:  '^# ?Domain = .*$'
     replace: 'Domain = tardfree.net'
 
 - name: Check if nasmount has been created before
