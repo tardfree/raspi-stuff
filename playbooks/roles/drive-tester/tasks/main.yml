@@ -1,0 +1,9 @@
+---
+
+- name: Install packages for drive testing
+  apt:
+    name:
+      - smartmontools
+      - iotop
+      - tmux
+    update_cache: true
