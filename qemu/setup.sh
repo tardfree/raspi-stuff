@@ -1,9 +1,9 @@
 #!/bin/bash
 
-RASPIOS_ZIP=../images/2020-05-27-raspios-buster-lite-armhf.zip
+RASPIOS_ZIP=../images/2021-05-07-raspios-buster-armhf-lite.zip
 #https://github.com/dhruvvyas90/qemu-rpi-kernel
-QEMUKERNEL=https://github.com/dhruvvyas90/qemu-rpi-kernel/raw/master/kernel-qemu-4.19.50-buster
-DTBFILE=https://github.com/dhruvvyas90/qemu-rpi-kernel/raw/master/versatile-pb-buster.dtb
+QEMUKERNEL=https://github.com/dhruvvyas90/qemu-rpi-kernel/raw/master/kernel-qemu-5.4.51-buster
+DTBFILE=https://github.com/dhruvvyas90/qemu-rpi-kernel/raw/master/versatile-pb-buster-5.4.51.dtb
 MNTPOINT=/mnt/1
 TARGETDIR=runtime
 
@@ -32,6 +32,6 @@ sudo umount ${MNTPOINT}
 echo Converting image
 echo qemu-img convert -f raw ${IMG} -O qcow2 ${IMG%.*}.qcow2
 qemu-img convert -f raw ${IMG} -O qcow2 ${IMG%.*}.qcow2
-#rm -f ${IMG}
+rm -f ${IMG}
 
 echo Done

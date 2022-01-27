@@ -3,6 +3,7 @@ raspberrypi #out of box hostname
 clearpi 
 blackpi
 einkpi
+yellowpi
 pi4
 pi400
 qemu ansible_port=5022 ansible_host=localhost

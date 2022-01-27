@@ -12,12 +12,13 @@ qemu-system-arm \
   --machine versatilepb \
   --cpu arm1176 \
   --m 256 \
-  --drive format=qcow2,file=${IMG} \
+  --drive format=qcow2,file=${IMG},if=none,index=0,media=disk,id=disk0 \
+  --device virtio-blk-pci,drive=disk0,disable-modern=on,disable-legacy=off \
   --net nic \
   --net user,hostfwd=tcp::5022-:22 \
   --dtb ${DTB} \
   --kernel ${KERNEL} \
-  --append 'root=/dev/sda2 rootfstype=ext4 elevator=deadline fsck.repair=yes rootwait' # panic=1'
+  --append 'root=/dev/vda2 rootfstype=ext4 elevator=deadline fsck.repair=yes rootwait' # panic=1'
 
 #  --no-reboot
 # this means any reboot will quit the emulator
