@@ -7,15 +7,19 @@ if [ $# -eq 0 ] ; then
 	exit
 fi
 
-IMGSRCZIP=images/2020-12-02-raspios-buster-armhf-lite.zip
+IMGSRCZIP=images/2022-04-04-raspios-bullseye-armhf-lite.img.xz
+IMGSRCZIP=images/2022-04-04-raspios-bullseye-arm64-lite.img.xz
 TGTDEVICE=${1}
 WIFI=${2:-0} #1 or 0
 WIFI_PLAY=playbooks/basicwificonfig.yml
 WIFI_VAR=piwifi_dest
 
 if [ "${TGTDEVICE}" == "/dev/sda" ] ; then
-	echo refusing to run with /dev/sda as the path
-	exit
+	echo WARNING MAKE EXTRA CAREFUL YOU MEAN TO RUN WITH /dev/sda AS THE PATH
+	echo WARNING MAKE EXTRA CAREFUL YOU MEAN TO RUN WITH /dev/sda AS THE PATH
+	echo WARNING MAKE EXTRA CAREFUL YOU MEAN TO RUN WITH /dev/sda AS THE PATH
+	echo WARNING MAKE EXTRA CAREFUL YOU MEAN TO RUN WITH /dev/sda AS THE PATH
+#	exit
 fi 
 
 if [ ! -f "${IMGSRCZIP}" ] ; then
@@ -46,16 +50,21 @@ MNTPOINT=$(mktemp -d)
 echo Mounting ${TGTPART} on ${MNTPOINT} to enable ssh...
 mkdir -p ${MNTPOINT}
 sudo mount ${TGTPART} ${MNTPOINT} -o uid=$(id -u),gid=$(id -g)
-echo "ssh" > ${MNTPOINT}/ssh
+
 if [ "${WIFI}" == "1" ] ; then
-	#wpa_supplicant.conf file produced via ansible template module. settings from vault.
-	if ! out=$( ansible-playbook -i '127.0.0.1,' ${WIFI_PLAY} -e ${WIFI_VAR}=${MNTPOINT} -e ansible_python_interpreter=/usr/bin/python3 ) ; then
-		echo "Wifi setup error:"
-		echo $out
-	else
-		echo "Wifi setup complete"
-	fi
+	EXTRAVARS="-e piwifi_enabled=true"
+else
+	EXTRAVARS="-e piwifi_enabled=false"
 fi
+# enable ssh and set the userconf file for username pi, password from vault
+# and wpa_supplicant.conf file, settings from vault if enabled above
+if ! out=$( ansible-playbook -vvv -i '127.0.0.1,' ${WIFI_PLAY} -e ${WIFI_VAR}=${MNTPOINT} ${EXTRAVARS} ) ; then
+	echo "Ansible playbook setup error:"
+	echo $out
+else
+	echo "Ansible playbook setup complete"
+fi
+echo $out >> ansible.output.txt
 sudo umount ${MNTPOINT}
 
 echo All done
