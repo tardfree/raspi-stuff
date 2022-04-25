@@ -1,18 +1,20 @@
 ---
 
+#target
+pisdsetup_dest: "/boot"
+
 #create the userconf file
-piwifi_piuser: pi
-piwifi_piuser_password: raspberry #the original default, should be overridden
-piwifi_userconf_enable: true
+pisdsetup_userconf_enable: true
+pisdsetup_piuser: pi
+pisdsetup_piuser_password: raspberry #the original default, should be overridden
 
 #wifi settings
-piwifi_enabled: true
-piwifi_country: "AU"
-piwifi_dest: "/boot"
+pisdsetup_wifi_enable: true
+pisdsetup_wifi_country: "AU"
 
 # Blank means don't configure
-piwifi_ssid: "{{ vault_wifi_network_ssid | default('') }}"
-piwifi_psk: "{{ vault_wifi_network_psk | default('') }}"
+pisdsetup_wifi_ssid: "{{ vault_wifi_network_ssid | default('') }}"
+pisdsetup_wifi_psk: "{{ vault_wifi_network_psk | default('') }}"
 
 # Also produce the preboot ssh enable flag file
-piwifi_ssh_enable: true
+pisdsetup_ssh_enable: true

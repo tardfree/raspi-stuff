@@ -2,23 +2,23 @@
 
 - name: Generate the userconf file
   copy:
-    content: "{{ piwifi_piuser }}:{{ piwifi_piuser_password | password_hash('sha512') }}"
-    dest: "{{ piwifi_dest }}/userconf"
-  when: piwifi_userconf_enable | bool
+    content: "{{ pisdsetup_piuser }}:{{ pisdsetup_piuser_password | password_hash('sha512') }}"
+    dest: "{{ pisdsetup_dest }}/userconf"
+  when: pisdsetup_userconf_enable | bool
 #https://www.raspberrypi.com/news/raspberry-pi-bullseye-update-april-2022/
 #echo 'mypassword' | openssl passwd -6 -stdin
 
-- name: Install wpa_supplicant configuraiton
+- name: Install wpa_supplicant configuration
   template:
     src: wpa_supplicant.conf.j2
-    dest: "{{ piwifi_dest }}/wpa_supplicant.conf"
+    dest: "{{ pisdsetup_dest }}/wpa_supplicant.conf"
   when: 
-    - piwifi_enabled | bool
-    - piwifi_ssid | length > 0
+    - pisdsetup_wifi_enable | bool
+    - pisdsetup_wifi_ssid | length > 0
 
 - name: Create the preboot ssh enable file
   copy:
     content: ""
-    dest: "{{ piwifi_dest }}/ssh"
-  when: piwifi_ssh_enable | bool
+    dest: "{{ pisdsetup_dest }}/ssh"
+  when: pisdsetup_ssh_enable | bool
   

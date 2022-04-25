@@ -11,8 +11,8 @@ IMGSRCZIP=images/2022-04-04-raspios-bullseye-armhf-lite.img.xz
 IMGSRCZIP=images/2022-04-04-raspios-bullseye-arm64-lite.img.xz
 TGTDEVICE=${1}
 WIFI=${2:-0} #1 or 0
-WIFI_PLAY=playbooks/basicwificonfig.yml
-WIFI_VAR=piwifi_dest
+WIFI_PLAY=playbooks/basic-sdsetup.yml
+WIFI_VAR=pisdsetup_dest
 
 if [ "${TGTDEVICE}" == "/dev/sda" ] ; then
 	echo WARNING MAKE EXTRA CAREFUL YOU MEAN TO RUN WITH /dev/sda AS THE PATH
@@ -52,9 +52,9 @@ mkdir -p ${MNTPOINT}
 sudo mount ${TGTPART} ${MNTPOINT} -o uid=$(id -u),gid=$(id -g)
 
 if [ "${WIFI}" == "1" ] ; then
-	EXTRAVARS="-e piwifi_enabled=true"
+	EXTRAVARS="-e pisdsetup_wifi_enable=true"
 else
-	EXTRAVARS="-e piwifi_enabled=false"
+	EXTRAVARS="-e pisdsetup_wifi_enable=false"
 fi
 # enable ssh and set the userconf file for username pi, password from vault
 # and wpa_supplicant.conf file, settings from vault if enabled above

@@ -3,18 +3,18 @@
 # It also enables ssh and sets the user account up.
 
 # Used like this (for example, with local inventory):
-# ansible-playbook basicwificonfig.yml -e piwifi_dest=/tmp/
+# ansible-playbook basic-sdsetup.yml -e pisdsetup_dest=/tmp/
 
 - hosts: localhost
   connection: local
   gather_facts: no
   vars:
-    piwifi_dest: /tmp
+    pisdsetup_dest: /tmp
   tasks:
     - import_role:
         name: pi-wifi
       vars:
-        piwifi_userconf_enable: true
-        piwifi_enabled: true
-        piwifi_ssh_enable: true
-        piwifi_piuser_password: "{{ vault_piuser_password }}"
+        pisdsetup_userconf_enable: true
+        pisdsetup_wifi_enable: true
+        pisdsetup_ssh_enable: true
+        pisdsetup_piuser_password: "{{ vault_piuser_password }}"
