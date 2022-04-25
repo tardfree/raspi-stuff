@@ -1,5 +1,11 @@
 ---
 
+#create the userconf file
+piwifi_piuser: pi
+piwifi_piuser_password: raspberry #the original default, should be overridden
+piwifi_userconf_enable: true
+
+#wifi settings
 piwifi_enabled: true
 piwifi_country: "AU"
 piwifi_dest: "/boot"

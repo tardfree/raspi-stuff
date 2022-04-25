@@ -8,11 +8,12 @@
   connection: local
   gather_facts: no
   vars:
-    - piwifi_dest: /tmp
-    - ansible_python_interpreter: /usr/bin/python3
+    piwifi_dest: /tmp
   tasks:
     - import_role:
         name: pi-wifi
       vars:
+        piwifi_userconf_enable: true
         piwifi_enabled: true
         piwifi_ssh_enable: true
+        piwifi_piuser_password: "{{ vault_piuser_password }}"

@@ -1,5 +1,13 @@
 ---
 
+- name: Generate the userconf file
+  copy:
+    content: "{{ piwifi_piuser }}:{{ piwifi_piuser_password | password_hash('sha512') }}"
+    dest: "{{ piwifi_dest }}/userconf"
+  when: piwifi_userconf_enable | bool
+#https://www.raspberrypi.com/news/raspberry-pi-bullseye-update-april-2022/
+#echo 'mypassword' | openssl passwd -6 -stdin
+
 - name: Install wpa_supplicant configuraiton
   template:
     src: wpa_supplicant.conf.j2
