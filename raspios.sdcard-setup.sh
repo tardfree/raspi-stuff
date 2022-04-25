@@ -47,7 +47,7 @@ sync
 #TGTPART=$(lsblk -o NAME,TYPE -n -p -l ${TGTDEVICE} | awk 'NR==2{print $1}')
 TGTPART=/dev/$(ls -1 /sys/block/${TGTDEVICE#/dev/}/${TGTDEVICE#/dev/}*/partition | awk -F'/' 'NR==1{print $5}')
 MNTPOINT=$(mktemp -d)
-echo Mounting ${TGTPART} on ${MNTPOINT} to enable ssh...
+echo Mounting ${TGTPART} on ${MNTPOINT} to create user account and enable ssh...
 mkdir -p ${MNTPOINT}
 sudo mount ${TGTPART} ${MNTPOINT} -o uid=$(id -u),gid=$(id -g)
 
@@ -58,13 +58,12 @@ else
 fi
 # enable ssh and set the userconf file for username pi, password from vault
 # and wpa_supplicant.conf file, settings from vault if enabled above
-if ! out=$( ansible-playbook -vvv -i '127.0.0.1,' ${WIFI_PLAY} -e ${WIFI_VAR}=${MNTPOINT} ${EXTRAVARS} ) ; then
+if ! out=$( ansible-playbook -i '127.0.0.1,' ${WIFI_PLAY} -e ${WIFI_VAR}=${MNTPOINT} ${EXTRAVARS} -e ansible_python_interpreter=/usr/bin/python3 ) ; then
 	echo "Ansible playbook setup error:"
 	echo $out
 else
 	echo "Ansible playbook setup complete"
 fi
-echo $out >> ansible.output.txt
 sudo umount ${MNTPOINT}
 
 echo All done

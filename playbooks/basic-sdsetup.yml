@@ -12,7 +12,7 @@
     pisdsetup_dest: /tmp
   tasks:
     - import_role:
-        name: pi-wifi
+        name: pi-sdsetup
       vars:
         pisdsetup_userconf_enable: true
         pisdsetup_wifi_enable: true
