@@ -1,5 +1,6 @@
 ---
 # This play is to generate the supplicant config for an SD card writing process.
+# It also enables ssh and sets the user account up.
 
 # Used like this (for example, with local inventory):
 # ansible-playbook basicwificonfig.yml -e piwifi_dest=/tmp/
