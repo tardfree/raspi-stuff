@@ -42,4 +42,4 @@
     src: "{{ nas_hostname }}:/{{ nas_hostname }}"
     fstype: nfs
     state: mounted
-    opts: "vers=4,timeo=50,comment=systemd.automount,_netdev"
+    opts: "vers=4,timeo=50,x-systemd.automount,_netdev,nofail"
