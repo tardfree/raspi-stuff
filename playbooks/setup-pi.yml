@@ -2,10 +2,10 @@
 # Setup an everyday pi
 
 # Pre-reqs:
-# * Out of box, raspios (raspbian) pi WITH SSH enabled
+# * Out of box, raspios (raspbian) pi WITH SSH enabled and user pi created with vaulted password
 
 # Initial ansible connection test: (this assumes raspberrypi resolves in dns)
-# ansible pi -m setup -e "ansible_password=raspberry ansible_user=pi" --limit=raspberrypi
+# ansible pi -m setup -e "ansible_password='{{vault_piuser_password}}' ansible_user=pi" --limit=raspberrypi
 # (this is using group pi, so the ssh ansible_ssh_common_args are set)
 
 # Provision:
@@ -24,7 +24,7 @@
   remote_user: pi
   become: yes
   vars:
-    ansible_password: raspberry #this is the initial password only, and gets changed
+    ansible_password: "{{ vault_piuser_password }}" #was raspberry bullseye and on it's no longer defaulted
 
   tasks:
     - import_role:
